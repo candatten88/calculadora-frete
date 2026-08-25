@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Importação & Marketplaces</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+    body {
+      background-color: #121212;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+      margin: 0;
+    }
+    .container {
+      background-color: #1e1e1e;
+      border: 2px solid #ff9900;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 1200px;
+      padding: 24px;
+    }
+    h1 {
+      color: #ff9900;
+      text-align: center;
+      font-size: 24px;
+      margin-top: 0;
+      margin-bottom: 4px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #aaa;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .grid-paisagem {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .grid-paisagem {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .section-title {
+      color: #ff9900;
+      border-bottom: 1px solid #333;
+      padding-bottom: 6px;
+      margin-top: 0;
+      margin-bottom: 15px;
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+    .form-group.full-width {
+      grid-column: span 2;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 4px;
+      color: #ddd;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #333;
+      background-color: #121212;
+      color: #fff;
+      font-size: 14px;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #ff9900;
+    }
+
+    .btn-calc {
+      width: 100%;
+      background-color: #ff9900;
+      color: #000;
+      font-weight: bold;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
+      margin-top: 10px;
+      margin-bottom: 16px;
+    }
+    .btn-calc:hover {
+      background-color: #e68a00;
+    }
+
+    .status-dolar {
+      font-size: 11px;
+      color: #2ed573;
+      margin-top: 2px;
+      display: block;
+    }
+
+    .results-box {
+      background-color: #181818;
+      border-radius: 8px;
+      padding: 16px;
+      border: 1px solid #333;
+    }
+    .results-title {
+      color: #ff9900;
+      text-align: center;
+      font-size: 16px;
+      margin-bottom: 12px;
+      font-weight: bold;
+    }
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid #2a2a2a;
+      font-size: 13px;
+      color: #bbb;
+    }
+    .result-row strong {
+      color: #fff;
+    }
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 2px solid #ff9900;
+      color: #ff9900;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .unit-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 13px;
+      color: #aaa;
+    }
+
+    .marketplaces-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .mp-card {
+      background-color: #222;
+      border-radius: 8px;
+      padding: 12px 14px;
+      border-left: 4px solid #ff9900;
+    }
+    .mp-card.shopee { border-left-color: #ee4d2d; }
+    .mp-card.ml { border-left-color: #ffe600; }
+    .mp-card.tiktok { border-left-color: #25f4ee; }
+
+    .mp-header {
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .mp-header.shopee { color: #ff6433; }
+    .mp-header.ml { color: #ffe600; }
+    .mp-header.tiktok { color: #25f4ee; }
+
+    .mp-detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .mp-detail {
+      font-size: 11px;
+      color: #aaa;
+    }
+    .mp-detail span {
+      display: block;
+    }
+    .mp-detail strong {
+      color: #fff;
+      font-size: 12px;
+    }
+
+    .mp-profit-container {
+      border-top: 1px dashed #444;
+      padding-top: 6px;
+      margin-top: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .mp-profit {
+      font-size: 13px;
+      font-weight: bold;
+      color: #2ed573;
+    }
+    .mp-profit-total {
+      font-size: 14px;
+      font-weight: bold;
+      color: #2ed573;
+    }
+    .mp-profit.negative, .mp-profit-total.negative {
+      color: #ff4757;
+    }
+
+    .select-ml-tipo {
+      background-color: #121212;
+      color: #ffe600;
+      border: 1px solid #444;
+      padding: 2px 6px;
+      font-size: 11px;
+      border-radius: 4px;
+      width: auto;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Calculadora de Importação & Marketplaces</h1>
+  <div class="subtitle">ICMS Por Estado + Simulação de Vendas e Margem de Lucro MEI</div>
+
+  <div class="grid-paisagem">
+    
+    <!-- COLUNA ESQUERDA -->
+    <div>
+      <div class="section-title">1. Custos da Importação</div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="produto">Total Produtos (USD)</label>
+          <input type="number" id="produto" step="0.01" placeholder="Ex: 59.00" oninput="calcular()">
+        </div>
+
+        <div class="form-group">
+          <label for="frete">Frete (USD)</label>
+          <input type="number" id="frete" step="0.01" placeholder="Ex: 19.42" oninput="calcular()">
+        </div>
+
+        <div class="form-group">
+          <label for="seguro">Seguro USD (Opcional)</label>
+          <input type="number" id="seguro" step="0.01" placeholder="0.00" oninput="calcular()">
+        </div>
+
+        <div class="form-group">
+          <label for="dolar">Dólar do Dia (R$)</label>
+          <input type="number" id="dolar" step="0.01" placeholder="Buscando..." oninput="calcular()">
+          <span id="dolar-status" class="status-dolar">🔄 Buscando cotação ao vivo...</span>
+        </div>
+
+        <div class="form-group">
+          <label for="estado_icms">Estado / Alíquota ICMS</label>
+          <select id="estado_icms" onchange="calcular()">
+            <option value="19.5">Paraná (19,5%)</option>
+            <option value="17">Espírito Santo (17%)</option>
+            <option value="18">São Paulo (18%)</option>
+            <option value="19">Pará (19%)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="qtd">Quantidade Comprada</label>
+          <input type="number" id="qtd" placeholder="Ex: 100" oninput="calcular()">
+        </div>
+
+        <div class="form-group full-width">
+          <label for="outras">Outras Despesas/Tarifa ADM Lote (R$) - Opcional</label>
+          <input type="number" id="outras" step="0.01" placeholder="0.00" oninput="calcular()">
+        </div>
+      </div>
+
+      <button class="btn-calc" onclick="calcular()">Recalcular Custos</button>
+
+      <div class="results-box">
+        <div class="results-title">Resumo do Custo da Importação</div>
+        
+        <div class="result-row">
+          <span>VMLD (Produto+Frete+Seguro):</span>
+          <strong id="res-vmld">R$ 0,00</strong>
+        </div>
+        <div class="result-row">
+          <span>Imposto II (60%):</span>
+          <strong id="res-ii">R$ 0,00</strong>
+        </div>
+        <div class="result-row">
+          <span>Subtotal (VMLD + II):</span>
+          <strong id="res-subtotal">R$ 0,00</strong>
+        </div>
+        <div class="result-row">
+          <span>Base ICMS:</span>
+          <strong id="res-base-icms">R$ 0,00</strong>
+        </div>
+        <div class="result-row" id="label-icms-text">
+          <span>ICMS:</span>
+          <strong id="res-icms">R$ 0,00</strong>
+        </div>
+        <div class="result-row">
+          <span>Total Impostos Importação:</span>
+          <strong id="res-tributos">R$ 0,00</strong>
+        </div>
+
+        <div class="total-row">
+          <span>Custo Total Importação Lote:</span>
+          <span id="res-total">R$ 0,00</span>
+        </div>
+
+        <div class="unit-row">
+          <span>Custo Unitário de Importação:</span>
+          <strong id="res-unitario" style="color:#ff9900; font-size:16px;">R$ 0,00</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLUNA DIREITA -->
+    <div>
+      <div class="section-title">2. Estimativa de Lucro nos Marketplaces</div>
+
+      <div class="form-grid" style="margin-bottom: 20px;">
+        <div class="form-group">
+          <label for="venda_unit" style="font-size: 13px; color: #ff9900;">Preço de Venda Pretendido (R$)</label>
+          <input type="number" id="venda_unit" step="0.01" placeholder="Ex: 35.00" oninput="calcular()" style="font-size: 16px; font-weight: bold; border-color: #ff9900;">
+        </div>
+
+        <div class="form-group">
+          <label for="embalagem_unit" style="font-size: 13px; color: #ff9900;">Embalagem por Unidade (R$)</label>
+          <input type="number" id="embalagem_unit" step="0.01" placeholder="Ex: 0.70" oninput="calcular()" style="font-size: 16px; font-weight: bold; border-color: #ff9900;">
+        </div>
+      </div>
+
+      <div class="marketplaces-grid">
+        
+        <!-- SHOPEE -->
+        <div class="mp-card shopee">
+          <div class="mp-header shopee">
+            <span>Shopee</span>
+            <span id="shopee-tax-desc">20% + R$ 4,00</span>
+          </div>
+          <div class="mp-detail-grid">
+            <div class="mp-detail"><span>Preço Venda:</span><strong id="shopee-venda">R$ 0,00</strong></div>
+            <div class="mp-detail"><span>Taxa Plataforma:</span><strong id="shopee-taxa">- R$ 0,00</strong></div>
+            <div class="mp-detail"><span>Custo Produto:</span><strong id="shopee-custo">- R$ 0,00</strong></div>
+            <div class="mp-detail"><span>Embalagem:</span><strong id="shopee-emb">- R$ 0,00</strong></div>
+          </div>
+          <div class="mp-profit-container">
+            <div class="mp-profit" id="shopee-lucro-box"><span>Unitário: </span><span id="shopee-lucro">R$ 0,00 (0%)</span></div>
+            <div class="mp-profit-total" id="shopee-lucro-total-box"><span>Lote: </span><span id="shopee-lucro-total">R$ 0,00</span></div>
+          </div>
+        </div>
+
+        <!-- MERCADO LIVRE -->
+        <div class="mp-card ml">
+          <div class="mp-header ml">
+            <div>
+              <span>Mercado Livre</span>
+              <select id="ml_tipo" class="select-ml-tipo" onchange="calcular()">
+                <option value="0.12">Clássico (12%)</option>
+                <option value="0.17">Premium (17%)</option>
+              </select>
+            </div>
+            <span id="ml-tax-desc">12% + Taxa Fixa</span>
+          </div>
+          <div class="mp-detail-grid">
+            <div class="mp-detail"><span>Preço Venda:</span><strong id="ml-venda">R$ 0,00</strong></div>
+            <div class="mp-detail"><span>Taxa Estimada:</span><strong id="ml-taxa">- R$ 0,00</strong></div>
+            <div class="mp-detail"><span>Custo Produto:</span><strong id="ml-custo">- R$ 0,00</strong></div>
+            <div class="mp-detail"><span>Embalagem:</span><strong id="ml-emb">- R$ 0,00</strong></div>
+          </div>
+          <div class="mp-profit-container">
+            <div class="mp-profit" id="ml-lucro-box"><span>Unitário: </span><span id="ml-lucro">R$ 0,00 (0%)</span></div>
+            <div class="mp-profit-total" id="ml-lucro-total-box"><span>Lote: </span><span id="ml-lucro-total">R$ 0,00</span></div>
+          </div>
+        </div>
+
+        <!-- TIKTOK SHOP -->
+        <div class="mp-card tiktok">
+          <div class="mp-header tiktok">
+            <span>TikTok Shop</span>
+            <span id="tiktok-tax-desc">10% + R$ 4,00</span>
+          </div>
+          <div class="mp-detail-grid">
+            <div class="mp-detail"><span>Preço Venda:</span><strong id="tiktok-venda">R$ 0,00</strong></div>
+            <div class="mp-detail"><span>Taxa Plataforma:</span><strong id="tiktok-taxa">- R$ 0,00</strong></div>
+            <div class="mp-detail"><span>Custo Produto:</span><strong id="tiktok-custo">- R$ 0,00</strong></div>
+            <div class="mp-detail"><span>Embalagem:</span><strong id="tiktok-emb">- R$ 0,00</strong></div>
+          </div>
+          <div class="mp-profit-container">
+            <div class="mp-profit" id="tiktok-lucro-box"><span>Unitário: </span><span id="tiktok-lucro">R$ 0,00 (0%)</span></div>
+            <div class="mp-profit-total" id="tiktok-lucro-total-box"><span>Lote: </span><span id="tiktok-lucro-total">R$ 0,00</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function fmt(valor) {
+    return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+
+  async function buscarDolar() {
+    const dolarInput = document.getElementById('dolar');
+    const dolarStatus = document.getElementById('dolar-status');
+    try {
+      const response = await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL');
+      const data = await response.json();
+      const cotacao = parseFloat(data.USDBRL.bid);
+      
+      dolarInput.value = cotacao.toFixed(2);
+      dolarStatus.innerText = `✓ Atualizado via internet (R$ ${cotacao.toFixed(2)})`;
+      dolarStatus.style.color = '#2ed573';
+      calcular();
+    } catch (error) {
+      dolarStatus.innerText = '⚠️ Falha ao buscar dólar online. Digite manualmente.';
+      dolarStatus.style.color = '#ff4757';
+    }
+  }
+
+  function calcular() {
+    // 1. CUSTOS DE IMPORTAÇÃO
+    const produto = parseFloat(document.getElementById('produto').value) || 0;
+    const frete = parseFloat(document.getElementById('frete').value) || 0;
+    const seguro = parseFloat(document.getElementById('seguro').value) || 0;
+    const dolar = parseFloat(document.getElementById('dolar').value) || 0;
+    const icmsRate = (parseFloat(document.getElementById('estado_icms').value) || 0) / 100;
+    const qtd = parseInt(document.getElementById('qtd').value) || 1;
+    const outras = parseFloat(document.getElementById('outras').value) || 0;
+
+    const vmldUSD = produto + frete + seguro;
+    const vmldBRL = vmldUSD * dolar;
+
+    const impostoII = vmldBRL * 0.60;
+    const subtotal = vmldBRL + impostoII;
+
+    const baseICMS = (1 - icmsRate) > 0 ? (subtotal + outras) / (1 - icmsRate) : 0;
+    const icms = baseICMS * icmsRate;
+
+    const totalTributos = impostoII + icms;
+    const custoTotalImportacao = vmldBRL + totalTributos + outras;
+    const custoUnitarioImportacao = qtd > 0 ? custoTotalImportacao / qtd : 0;
+
+    document.getElementById('label-icms-text').children[0].innerText = `ICMS (${(icmsRate * 100).toFixed(1).replace('.', ',')}%):`;
+    document.getElementById('res-vmld').innerText = fmt(vmldBRL);
+    document.getElementById('res-ii').innerText = fmt(impostoII);
+    document.getElementById('res-subtotal').innerText = fmt(subtotal);
+    document.getElementById('res-base-icms').innerText = fmt(baseICMS);
+    document.getElementById('res-icms').innerText = fmt(icms);
+    document.getElementById('res-tributos').innerText = fmt(totalTributos);
+    document.getElementById('res-total').innerText = fmt(custoTotalImportacao);
+    document.getElementById('res-unitario').innerText = fmt(custoUnitarioImportacao);
+
+    // 2. SIMULAÇÃO MARKETPLACES & EMBALAGEM
+    const precoVenda = parseFloat(document.getElementById('venda_unit').value) || 0;
+    const embalagemUnit = parseFloat(document.getElementById('embalagem_unit').value) || 0;
+
+    // Shopee
+    let pctShopee = precoVenda < 80 ? 0.20 : 0.14;
+    let comissaoShopee = precoVenda * pctShopee;
+    if (comissaoShopee > 100) comissaoShopee = 100; // Teto R$ 100
+
+    let taxaFixaShopee = precoVenda < 80 ? 4.00 : (precoVenda < 100 ? 16.00 : (precoVenda < 200 ? 20.00 : 26.00));
+    let shopeeTaxa = comissaoShopee + taxaFixaShopee;
+    let shopeeDesc = precoVenda < 80 ? "20% + R$ 4,00" : "14% + Taxa Fixa";
+
+    const shopeeLucroUnit = precoVenda - shopeeTaxa - custoUnitarioImportacao - embalagemUnit;
+    const shopeeLucroTotal = shopeeLucroUnit * qtd;
+    const shopeeMargem = precoVenda > 0 ? (shopeeLucroUnit / precoVenda) * 100 : 0;
+
+    document.getElementById('shopee-tax-desc').innerText = shopeeDesc;
+    document.getElementById('shopee-venda').innerText = fmt(precoVenda);
+    document.getElementById('shopee-taxa').innerText = "- " + fmt(shopeeTaxa);
+    document.getElementById('shopee-custo').innerText = "- " + fmt(custoUnitarioImportacao);
+    document.getElementById('shopee-emb').innerText = "- " + fmt(embalagemUnit);
+    document.getElementById('shopee-lucro').innerText = `${fmt(shopeeLucroUnit)} (${shopeeMargem.toFixed(1)}%)`;
+    document.getElementById('shopee-lucro-total').innerText = fmt(shopeeLucroTotal);
+    document.getElementById('shopee-lucro-box').className = "mp-profit" + (shopeeLucroUnit < 0 ? " negative" : "");
+    document.getElementById('shopee-lucro-total-box').className = "mp-profit-total" + (shopeeLucroUnit < 0 ? " negative" : "");
+
+    // Mercado Livre (Com seletor Clássico / Premium)
+    let mlTaxa = 0;
+    let mlDesc = "";
+    const pctML = parseFloat(document.getElementById('ml_tipo').value) || 0.12;
+    const pctMLTexto = (pctML * 100).toFixed(0) + "%";
+
+    if (precoVenda <= 29.00) {
+      mlTaxa = (precoVenda * pctML) + 6.00;
+      mlDesc = `${pctMLTexto} + R$ 6,00`;
+    } else if (precoVenda <= 50.00) {
+      mlTaxa = (precoVenda * pctML) + 6.50;
+      mlDesc = `${pctMLTexto} + R$ 6,50`;
+    } else if (precoVenda < 79.00) {
+      mlTaxa = (precoVenda * pctML) + 6.75;
+      mlDesc = `${pctMLTexto} + R$ 6,75`;
+    } else {
+      mlTaxa = (precoVenda * pctML) + 18.00; // Frete Grátis Mínimo
+      mlDesc = `${pctMLTexto} + Frete Grátis (~R$18)`;
+    }
+    
+    const mlLucroUnit = precoVenda - mlTaxa - custoUnitarioImportacao - embalagemUnit;
+    const mlLucroTotal = mlLucroUnit * qtd;
+    const mlMargem = precoVenda > 0 ? (mlLucroUnit / precoVenda) * 100 : 0;
+
+    document.getElementById('ml-tax-desc').innerText = mlDesc;
+    document.getElementById('ml-venda').innerText = fmt(precoVenda);
+    document.getElementById('ml-taxa').innerText = "- " + fmt(mlTaxa);
+    document.getElementById('ml-custo').innerText = "- " + fmt(custoUnitarioImportacao);
+    document.getElementById('ml-emb').innerText = "- " + fmt(embalagemUnit);
+    document.getElementById('ml-lucro').innerText = `${fmt(mlLucroUnit)} (${mlMargem.toFixed(1)}%)`;
+    document.getElementById('ml-lucro-total').innerText = fmt(mlLucroTotal);
+    document.getElementById('ml-lucro-box').className = "mp-profit" + (mlLucroUnit < 0 ? " negative" : "");
+    document.getElementById('ml-lucro-total-box').className = "mp-profit-total" + (mlLucroUnit < 0 ? " negative" : "");
+
+    // TikTok Shop
+    let pctTikTok = precoVenda < 50 ? 0.10 : 0.06;
+    let taxaFixaTikTok = precoVenda < 50 ? 4.00 : 6.00;
+    let tiktokTaxa = (precoVenda * pctTikTok) + taxaFixaTikTok;
+    let tiktokDesc = precoVenda < 50 ? "10% + R$ 4,00" : "6% + R$ 6,00";
+
+    const tiktokLucroUnit = precoVenda - tiktokTaxa - custoUnitarioImportacao - embalagemUnit;
+    const tiktokLucroTotal = tiktokLucroUnit * qtd;
+    const tiktokMargem = precoVenda > 0 ? (tiktokLucroUnit / precoVenda) * 100 : 0;
+
+    document.getElementById('tiktok-tax-desc').innerText = tiktokDesc;
+    document.getElementById('tiktok-venda').innerText = fmt(precoVenda);
+    document.getElementById('tiktok-taxa').innerText = "- " + fmt(tiktokTaxa);
+    document.getElementById('tiktok-custo').innerText = "- " + fmt(custoUnitarioImportacao);
+    document.getElementById('tiktok-emb').innerText = "- " + fmt(embalagemUnit);
+    document.getElementById('tiktok-lucro').innerText = `${fmt(tiktokLucroUnit)} (${tiktokMargem.toFixed(1)}%)`;
+    document.getElementById('tiktok-lucro-total').innerText = fmt(tiktokLucroTotal);
+    document.getElementById('tiktok-lucro-box').className = "mp-profit" + (tiktokLucroUnit < 0 ? " negative" : "");
+    document.getElementById('tiktok-lucro-total-box').className = "mp-profit-total" + (tiktokLucroUnit < 0 ? " negative" : "");
+  }
+
+  window.onload = function() {
+    buscarDolar();
+  };
+</script>
+
+</body>
+</html>
