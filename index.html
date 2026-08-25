@@ -322,7 +322,7 @@
         <div class="form-group">
           <label for="estado_icms">Estado / Alíquota ICMS</label>
           <select id="estado_icms" onchange="calcular()">
-            <option value="19.5">Paraná (19,5%)</option>
+            <option value="19">Paraná (19%)</option>
             <option value="17">Espírito Santo (17%)</option>
             <option value="18">São Paulo (18%)</option>
             <option value="19">Pará (19%)</option>
@@ -446,7 +446,7 @@
         <div class="mp-card tiktok">
           <div class="mp-header tiktok">
             <span>TikTok Shop</span>
-            <span id="tiktok-tax-desc">10% + R$ 4,00</span>
+            <span id="tiktok-tax-desc">8% + R$ 4,00</span>
           </div>
           <div class="mp-detail-grid">
             <div class="mp-detail"><span>Preço Venda:</span><strong id="tiktok-venda">R$ 0,00</strong></div>
@@ -527,10 +527,12 @@
     const impostoII = vmldBRL * 0.60;
     const subtotal = vmldBRL + impostoII;
 
+    // Cálculo da base do ICMS (inclui despesas acessórias "outras")
     const baseICMS = (1 - icmsRate) > 0 ? (subtotal + outras) / (1 - icmsRate) : 0;
     const icms = baseICMS * icmsRate;
 
     const totalTributos = impostoII + icms;
+    // Custo Total = VMLD + Tributos + Outras Despesas
     const custoTotalImportacao = vmldBRL + totalTributos + outras;
     const custoUnitarioImportacao = qtd > 0 ? custoTotalImportacao / qtd : 0;
 
@@ -548,14 +550,14 @@
     const precoVenda = parseFloat(document.getElementById('venda_unit').value) || 0;
     const embalagemUnit = parseFloat(document.getElementById('embalagem_unit').value) || 0;
 
-    // Shopee
-    let pctShopee = precoVenda < 80 ? 0.20 : 0.14;
-    let comissaoShopee = precoVenda * pctShopee;
+    // --- SHOPEE ---
+    // Regra: 20% comissão (14% + 6% frete grátis), teto R$ 100 de comissão + R$ 4,00 taxa fixa por item
+    let comissaoShopee = precoVenda * 0.20;
     if (comissaoShopee > 100) comissaoShopee = 100;
 
-    let taxaFixaShopee = precoVenda < 80 ? 4.00 : (precoVenda < 100 ? 16.00 : (precoVenda < 200 ? 20.00 : 26.00));
-    let shopeeTaxa = comissaoShopee + taxaFixaShopee;
-    let shopeeDesc = precoVenda < 80 ? "20% + R$ 4,00" : "14% + Taxa Fixa";
+    let taxaFixaShopee = 4.00;
+    let shopeeTaxa = precoVenda > 0 ? (comissaoShopee + taxaFixaShopee) : 0;
+    let shopeeDesc = "20% + R$ 4,00 (Teto R$100)";
 
     const shopeeLucroUnit = precoVenda - shopeeTaxa - custoUnitarioImportacao - embalagemUnit;
     const shopeeLucroTotal = shopeeLucroUnit * qtd;
@@ -571,31 +573,34 @@
     document.getElementById('shopee-lucro-box').className = "mp-profit" + (shopeeLucroUnit < 0 ? " negative" : "");
     document.getElementById('shopee-lucro-total-box').className = "mp-profit-total" + (shopeeLucroUnit < 0 ? " negative" : "");
 
-    // Mercado Livre
+    // --- MERCADO LIVRE ---
+    // Regra: < R$79 comissão% + taxa fixa (R$6 a R$6,75); >= R$79 comissão% + Frete Grátis (~R$18 a R$24)
     let mlTaxa = 0;
     let mlDesc = "";
     const pctML = parseFloat(document.getElementById('ml_tipo').value) || 0.12;
     const pctMLTexto = (pctML * 100).toFixed(0) + "%";
 
-    if (precoVenda <= 29.00) {
-      mlTaxa = (precoVenda * pctML) + 6.00;
-      mlDesc = `${pctMLTexto} + R$ 6,00`;
-    } else if (precoVenda <= 50.00) {
-      mlTaxa = (precoVenda * pctML) + 6.50;
-      mlDesc = `${pctMLTexto} + R$ 6,50`;
-    } else if (precoVenda < 79.00) {
-      mlTaxa = (precoVenda * pctML) + 6.75;
-      mlDesc = `${pctMLTexto} + R$ 6,75`;
-    } else {
-      mlTaxa = (precoVenda * pctML) + 18.00;
-      mlDesc = `${pctMLTexto} + Frete Grátis (~R$18)`;
+    if (precoVenda > 0) {
+      if (precoVenda <= 29.00) {
+        mlTaxa = (precoVenda * pctML) + 6.00;
+        mlDesc = `${pctMLTexto} + R$ 6,00`;
+      } else if (precoVenda <= 50.00) {
+        mlTaxa = (precoVenda * pctML) + 6.50;
+        mlDesc = `${pctMLTexto} + R$ 6,50`;
+      } else if (precoVenda < 79.00) {
+        mlTaxa = (precoVenda * pctML) + 6.75;
+        mlDesc = `${pctMLTexto} + R$ 6,75`;
+      } else {
+        mlTaxa = (precoVenda * pctML) + 18.00; // Frete Grátis obrigatório (estimativa leve)
+        mlDesc = `${pctMLTexto} + Frete Grátis (~R$18)`;
+      }
     }
     
     const mlLucroUnit = precoVenda - mlTaxa - custoUnitarioImportacao - embalagemUnit;
     const mlLucroTotal = mlLucroUnit * qtd;
     const mlMargem = precoVenda > 0 ? (mlLucroUnit / precoVenda) * 100 : 0;
 
-    document.getElementById('ml-tax-desc').innerText = mlDesc;
+    document.getElementById('ml-tax-desc').innerText = mlDesc || (pctMLTexto + " + Taxa Fixa");
     document.getElementById('ml-venda').innerText = fmt(precoVenda);
     document.getElementById('ml-taxa').innerText = "- " + fmt(mlTaxa);
     document.getElementById('ml-custo').innerText = "- " + fmt(custoUnitarioImportacao);
@@ -605,11 +610,12 @@
     document.getElementById('ml-lucro-box').className = "mp-profit" + (mlLucroUnit < 0 ? " negative" : "");
     document.getElementById('ml-lucro-total-box').className = "mp-profit-total" + (mlLucroUnit < 0 ? " negative" : "");
 
-    // TikTok Shop
-    let pctTikTok = precoVenda < 50 ? 0.10 : 0.06;
-    let taxaFixaTikTok = precoVenda < 50 ? 4.00 : 6.00;
-    let tiktokTaxa = (precoVenda * pctTikTok) + taxaFixaTikTok;
-    let tiktokDesc = precoVenda < 50 ? "10% + R$ 4,00" : "6% + R$ 6,00";
+    // --- TIKTOK SHOP ---
+    // Regra padrão: 6% comissão base + 2% taxa de transação (total 8%) + R$ 4,00 taxa fixa
+    let pctTikTok = 0.08;
+    let taxaFixaTikTok = 4.00;
+    let tiktokTaxa = precoVenda > 0 ? (precoVenda * pctTikTok) + taxaFixaTikTok : 0;
+    let tiktokDesc = "8% (6%+2%) + R$ 4,00";
 
     const tiktokLucroUnit = precoVenda - tiktokTaxa - custoUnitarioImportacao - embalagemUnit;
     const tiktokLucroTotal = tiktokLucroUnit * qtd;
@@ -631,9 +637,5 @@
   };
 </script>
 
-</body>
-</html>
-
-```
 </body>
 </html>
