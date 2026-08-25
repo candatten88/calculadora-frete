@@ -1,3 +1,6 @@
+Aqui está o código HTML atualizado com a adição da seção e dos botões de doação para **Pix** e **Bitcoin**, mantendo o mesmo estilo visual da sua aplicação:
+
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -240,6 +243,49 @@
       border-radius: 4px;
       width: auto;
     }
+
+    /* SEÇÃO DE DOAÇÃO */
+    .donation-section {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid #333;
+      text-align: center;
+    }
+    .donation-title {
+      font-size: 14px;
+      color: #aaa;
+      margin-bottom: 12px;
+    }
+    .donation-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .btn-donation {
+      background-color: #252525;
+      border: 1px solid #444;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .btn-donation:hover {
+      background-color: #333;
+      border-color: #ff9900;
+    }
+    .btn-donation.pix:hover {
+      border-color: #2ed573;
+    }
+    .btn-donation.btc:hover {
+      border-color: #f7931a;
+    }
   </style>
 </head>
 <body>
@@ -421,11 +467,33 @@
     </div>
 
   </div>
+
+  <!-- SEÇÃO DE DOAÇÃO -->
+  <div class="donation-section">
+    <div class="donation-title">Apoie o desenvolvimento deste projeto:</div>
+    <div class="donation-buttons">
+      <button class="btn-donation pix" onclick="copiarChave('d480218a-e2e5-41bc-9bd0-032cf22b5603', 'Pix')">
+        💚 Doar via Pix
+      </button>
+      <button class="btn-donation btc" onclick="copiarChave('bc1q8rm20kcg08epa5qnd5xv3pyryk3ctp8j5auuv5dufmmvh8cu9s8qmxqla0', 'Bitcoin')">
+        🟠 Doar via Bitcoin
+      </button>
+    </div>
+  </div>
+
 </div>
 
 <script>
   function fmt(valor) {
     return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+
+  function copiarChave(chave, tipo) {
+    navigator.clipboard.writeText(chave).then(() => {
+      alert(`Chave ${tipo} copiada para a área de transferência!`);
+    }).catch(() => {
+      alert(`Erro ao copiar. Chave ${tipo}: ${chave}`);
+    });
   }
 
   async function buscarDolar() {
@@ -486,7 +554,7 @@
     // Shopee
     let pctShopee = precoVenda < 80 ? 0.20 : 0.14;
     let comissaoShopee = precoVenda * pctShopee;
-    if (comissaoShopee > 100) comissaoShopee = 100; // Teto R$ 100
+    if (comissaoShopee > 100) comissaoShopee = 100;
 
     let taxaFixaShopee = precoVenda < 80 ? 4.00 : (precoVenda < 100 ? 16.00 : (precoVenda < 200 ? 20.00 : 26.00));
     let shopeeTaxa = comissaoShopee + taxaFixaShopee;
@@ -506,7 +574,7 @@
     document.getElementById('shopee-lucro-box').className = "mp-profit" + (shopeeLucroUnit < 0 ? " negative" : "");
     document.getElementById('shopee-lucro-total-box').className = "mp-profit-total" + (shopeeLucroUnit < 0 ? " negative" : "");
 
-    // Mercado Livre (Com seletor Clássico / Premium)
+    // Mercado Livre
     let mlTaxa = 0;
     let mlDesc = "";
     const pctML = parseFloat(document.getElementById('ml_tipo').value) || 0.12;
@@ -522,7 +590,7 @@
       mlTaxa = (precoVenda * pctML) + 6.75;
       mlDesc = `${pctMLTexto} + R$ 6,75`;
     } else {
-      mlTaxa = (precoVenda * pctML) + 18.00; // Frete Grátis Mínimo
+      mlTaxa = (precoVenda * pctML) + 18.00;
       mlDesc = `${pctMLTexto} + Frete Grátis (~R$18)`;
     }
     
@@ -566,5 +634,9 @@
   };
 </script>
 
+</body>
+</html>
+
+```
 </body>
 </html>
